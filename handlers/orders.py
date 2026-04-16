@@ -115,7 +115,7 @@ async def order_detail_handler(update: Update, context: ContextTypes.DEFAULT_TYP
         # Pagamento
         payment = session.query(Payment).filter_by(order_id=order.id).first()
         payment_text = ""
-        if payment:
+        if payment and payment.method:
             payment_method = {
                 'pix': '💠 PIX',
                 'credit_card': '💳 Cartão',

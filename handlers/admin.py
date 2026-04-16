@@ -4,6 +4,7 @@ Admin Handler - Painel administrativo
 
 from telegram import Update
 from telegram.ext import ContextTypes
+from sqlalchemy import func
 
 from app.config import config
 from app.database import db
@@ -12,6 +13,7 @@ from services.analytics import analytics
 from services.notifications import notifications
 from utils.keyboards import Keyboards
 from utils.helpers import format_currency, format_datetime
+from utils.logger import logger
 
 
 def is_admin(telegram_id: int) -> bool:
@@ -109,7 +111,7 @@ async def admin_users_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
     with db.get_session() as session:
         total_users = session.query(User).count()
         new_today = session.query(User).filter(
-            db.func.date(User.created_at) == db.func.date(db.func.now())
+            func.date(User.created_at) == func.date(func.now())
         ).count()
         banned = session.query(User).filter_by(is_banned=True).count()
     
@@ -406,9 +408,19 @@ async def admin_message_handler(update: Update, context: ContextTypes.DEFAULT_TY
                 
                 for user in users:
                     try:
-                        # Aqui você usaria o bot para enviar
+                        from main import setup_application
+                        from app.config import config
+                        from telegram import Bot
+                        
+                        bot = Bot(token=config.BOT_TOKEN)
+                        await bot.send_message(
+                            chat_id=user.telegram_id,
+                            text=context.user_data.get('broadcast_message', message),
+                            parse_mode='Markdown'
+                        )
                         sent += 1
-                    except:
+                    except Exception as e:
+                        logger.error(f"Erro ao enviar para {user.telegram_id}: {e}")
                         failed += 1
                 
                 await update.message.reply_text(

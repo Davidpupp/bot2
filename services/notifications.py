@@ -212,8 +212,6 @@ Clique em /carrinho para continuar
     
     async def affiliate_sale(self, affiliate_id: int, order_id: int, commission: float):
         """Notifica venda de afiliado"""
-        from app.models import Affiliate
-        
         with db.get_session() as session:
             affiliate = session.query(Affiliate).get(affiliate_id)
             if not affiliate:

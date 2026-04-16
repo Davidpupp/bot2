@@ -2,13 +2,14 @@
 Affiliate Handler - Programa de afiliados
 """
 
-from telegram import Update
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 
 from app.config import config
 from app.database import db
 from app.models import User, Affiliate
 from services.analytics import analytics
+from services.notifications import notifications
 from utils.keyboards import Keyboards
 from utils.helpers import format_currency
 

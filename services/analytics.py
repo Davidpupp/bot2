@@ -10,7 +10,7 @@ from typing import Dict, List, Any, Optional
 from sqlalchemy import func
 
 from app.database import db
-from app.models import User, Order, Payment, Product, OrderStatus, PaymentStatus
+from app.models import User, Order, Payment, Product, OrderStatus, PaymentStatus, OrderItem, Affiliate, AffiliateWithdrawal
 
 
 class AnalyticsService:
@@ -129,8 +129,6 @@ class AnalyticsService:
     
     def get_top_products(self, limit: int = 10) -> List[Dict]:
         """Produtos mais vendidos"""
-        from app.models import OrderItem
-        
         with db.get_session() as session:
             results = session.query(
                 Product.id,
@@ -185,8 +183,6 @@ class AnalyticsService:
     
     def get_affiliate_stats(self, affiliate_id: int) -> Dict[str, Any]:
         """Estatísticas de afiliado"""
-        from app.models import Affiliate, AffiliateWithdrawal
-        
         with db.get_session() as session:
             affiliate = session.query(Affiliate).get(affiliate_id)
             if not affiliate:
