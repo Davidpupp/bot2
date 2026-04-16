@@ -24,7 +24,7 @@ async def show_orders(update: Update, context: ContextTypes.DEFAULT_TYPE):
     with db.get_session() as session:
         db_user = session.query(User).filter_by(telegram_id=user.id).first()
         
-        if not db_user:
+        if db_user is None:
             message = "❌ Você precisa iniciar o bot primeiro.\nUse /start"
             if update.callback_query:
                 await update.callback_query.edit_message_text(message)
@@ -89,7 +89,7 @@ async def order_detail_handler(update: Update, context: ContextTypes.DEFAULT_TYP
     with db.get_session() as session:
         order = session.query(Order).get(order_id)
         
-        if not order:
+        if order is None:
             await query.edit_message_text(
                 "❌ Pedido não encontrado.",
                 reply_markup=Keyboards.back_to_menu()
@@ -115,7 +115,7 @@ async def order_detail_handler(update: Update, context: ContextTypes.DEFAULT_TYP
         # Pagamento
         payment = session.query(Payment).filter_by(order_id=order.id).first()
         payment_text = ""
-        if payment and payment.method:
+        if payment is not None and payment.method:
             payment_method = {
                 'pix': '💠 PIX',
                 'credit_card': '💳 Cartão',
@@ -183,7 +183,7 @@ async def delivery_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     with db.get_session() as session:
         order = session.query(Order).get(order_id)
         
-        if not order:
+        if order is None:
             await query.edit_message_text(
                 "❌ Pedido não encontrado.",
                 reply_markup=Keyboards.back_to_menu()
@@ -238,7 +238,7 @@ async def receipt_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         order = session.query(Order).get(order_id)
         payment = session.query(Payment).filter_by(order_id=order_id).first()
         
-        if not order:
+        if order is None:
             await query.answer("❌ Pedido não encontrado", show_alert=True)
             return
         

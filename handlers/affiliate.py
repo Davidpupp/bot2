@@ -26,7 +26,7 @@ async def show_affiliate_dashboard(update: Update, context: ContextTypes.DEFAULT
     with db.get_session() as session:
         db_user = session.query(User).filter_by(telegram_id=user.id).first()
         
-        if not db_user:
+        if db_user is None:
             message = "❌ Você precisa iniciar o bot primeiro.\nUse /start"
             if update.callback_query:
                 await update.callback_query.edit_message_text(message)
@@ -37,7 +37,7 @@ async def show_affiliate_dashboard(update: Update, context: ContextTypes.DEFAULT
         # Verificar se é afiliado
         affiliate = session.query(Affiliate).filter_by(user_id=db_user.id).first()
         
-        if not affiliate:
+        if affiliate is None:
             # Mostrar opção de virar afiliado
             message = f"""
 🤝 *PROGRAMA DE AFILIADOS*
@@ -112,7 +112,7 @@ async def affiliate_join_handler(update: Update, context: ContextTypes.DEFAULT_T
     with db.get_session() as session:
         db_user = session.query(User).filter_by(telegram_id=user.id).first()
         
-        if not db_user:
+        if db_user is None:
             await query.edit_message_text(
                 "❌ Erro: Usuário não encontrado.",
                 reply_markup=Keyboards.back_to_menu()
@@ -121,7 +121,7 @@ async def affiliate_join_handler(update: Update, context: ContextTypes.DEFAULT_T
         
         # Verificar se já é afiliado
         existing = session.query(Affiliate).filter_by(user_id=db_user.id).first()
-        if existing:
+        if existing is not None:
             await query.answer("Você já é afiliado!", show_alert=True)
             await show_affiliate_dashboard(update, context)
             return
@@ -154,7 +154,7 @@ async def affiliate_link_handler(update: Update, context: ContextTypes.DEFAULT_T
         db_user = session.query(User).filter_by(telegram_id=user.id).first()
         affiliate = session.query(Affiliate).filter_by(user_id=db_user.id).first()
         
-        if not affiliate:
+        if affiliate is None:
             return
         
         ref_link = f"https://t.me/{config.BOT_USERNAME}?start=ref_{affiliate.code}"
@@ -196,7 +196,7 @@ async def affiliate_stats_handler(update: Update, context: ContextTypes.DEFAULT_
         db_user = session.query(User).filter_by(telegram_id=user.id).first()
         affiliate = session.query(Affiliate).filter_by(user_id=db_user.id).first()
         
-        if not affiliate:
+        if affiliate is None:
             return
         
         stats = analytics.get_affiliate_stats(affiliate.id)
@@ -237,7 +237,7 @@ async def affiliate_withdraw_handler(update: Update, context: ContextTypes.DEFAU
         db_user = session.query(User).filter_by(telegram_id=user.id).first()
         affiliate = session.query(Affiliate).filter_by(user_id=db_user.id).first()
         
-        if not affiliate:
+        if affiliate is None:
             return
         
         balance = float(affiliate.balance)

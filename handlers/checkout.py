@@ -36,7 +36,7 @@ async def start_checkout(update: Update, context: ContextTypes.DEFAULT_TYPE):
     with db.get_session() as session:
         db_user = session.query(User).filter_by(telegram_id=user.id).first()
         
-        if not db_user:
+        if db_user is None:
             message = "❌ Você precisa iniciar o bot primeiro.\nUse /start"
             if update.callback_query:
                 await update.callback_query.edit_message_text(message)
@@ -46,7 +46,7 @@ async def start_checkout(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         cart = session.query(Cart).filter_by(user_id=db_user.id).first()
         
-        if not cart or not cart.items:
+        if cart is None or not cart.items:
             message = f"""
 🛒 *CARRINHO VAZIO*
 
@@ -100,7 +100,7 @@ Adicione produtos antes de finalizar a compra.
         discount = Decimal('0')
         if cart.coupon_code:
             coupon = session.query(Coupon).filter_by(code=cart.coupon_code).first()
-            if coupon and coupon.is_valid:
+            if coupon is not None and coupon.is_valid:
                 discount = Decimal(str(coupon.calculate_discount(float(subtotal))))
         
         total = subtotal - discount
@@ -291,7 +291,7 @@ async def show_pix_payment(update: Update, context: ContextTypes.DEFAULT_TYPE, p
     keyboard = Keyboards.payment_pix(payment.id, payment.pix_copy_paste)
     
     # Enviar QR code se disponível
-    if payment.pix_qr_code:
+    if payment.pix_qr_code is not None and payment.pix_qr_code != '':
         try:
             # Se é base64, decodificar
             if ',' in payment.pix_qr_code:
@@ -424,7 +424,7 @@ async def copy_pix_code(update: Update, context: ContextTypes.DEFAULT_TYPE, paym
     with db.get_session() as session:
         payment = session.query(Payment).get(payment_id)
         
-        if payment and payment.pix_copy_paste:
+        if payment is not None and payment.pix_copy_paste:
             # Enviar código em mensagem separada para facilitar cópia
             await query.message.reply_text(
                 f"`{payment.pix_copy_paste}`",
@@ -464,7 +464,7 @@ async def cancel_pix_payment(update: Update, context: ContextTypes.DEFAULT_TYPE,
     with db.get_session() as session:
         payment = session.query(Payment).get(payment_id)
         
-        if payment:
+        if payment is not None:
             await sillientpay.cancel_payment(payment.external_id)
             payment.status = PaymentStatus.CANCELLED
             
@@ -487,7 +487,7 @@ async def cancel_order(update: Update, context: ContextTypes.DEFAULT_TYPE, order
     with db.get_session() as session:
         order = session.query(Order).get(order_id)
         
-        if order and order.status == OrderStatus.PENDING:
+        if order is not None and order.status == OrderStatus.PENDING:
             order.status = OrderStatus.CANCELLED
             session.commit()
             
@@ -509,7 +509,7 @@ async def buy_now(update: Update, context: ContextTypes.DEFAULT_TYPE, product_id
     with db.get_session() as session:
         db_user = session.query(User).filter_by(telegram_id=user.id).first()
         
-        if not db_user:
+        if db_user is None:
             return
         
         # Limpar carrinho atual

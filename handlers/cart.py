@@ -25,13 +25,13 @@ async def show_cart(update: Update, context: ContextTypes.DEFAULT_TYPE):
     with db.get_session() as session:
         db_user = session.query(User).filter_by(telegram_id=user.id).first()
         
-        if not db_user:
+        if db_user is None:
             message = "❌ Você precisa iniciar o bot primeiro.\nUse /start"
             keyboard = Keyboards.back_to_menu()
         else:
             cart = session.query(Cart).filter_by(user_id=db_user.id).first()
             
-            if not cart or not cart.items:
+            if cart is None or not cart.items:
                 message = f"""
 🛒 *CARRINHO VAZIO*
 
@@ -49,7 +49,7 @@ Seu carrinho está esperando por produtos incríveis!
                 
                 for item in cart_items:
                     product = session.query(Product).get(item['product_id'])
-                    if product:
+                    if product is not None:
                         quantity = item.get('quantity', 1)
                         subtotal = float(product.price) * quantity
                         
@@ -115,7 +115,7 @@ async def add_to_cart_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
     with db.get_session() as session:
         db_user = session.query(User).filter_by(telegram_id=user.id).first()
         
-        if not db_user:
+        if db_user is None:
             await query.edit_message_text(
                 "❌ Erro: Usuário não encontrado. Use /start",
                 reply_markup=Keyboards.back_to_menu()
@@ -124,7 +124,7 @@ async def add_to_cart_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         
         product = session.query(Product).get(product_id)
         
-        if not product or not product.is_active:
+        if product is None or not product.is_active:
             await query.answer("❌ Produto indisponível", show_alert=True)
             return
         
@@ -135,7 +135,7 @@ async def add_to_cart_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         
         # Buscar ou criar carrinho
         cart = session.query(Cart).filter_by(user_id=db_user.id).first()
-        if not cart:
+        if cart is None:
             cart = Cart(user_id=db_user.id)
             session.add(cart)
             session.flush()
@@ -167,12 +167,12 @@ async def remove_from_cart_handler(update: Update, context: ContextTypes.DEFAULT
     with db.get_session() as session:
         db_user = session.query(User).filter_by(telegram_id=user.id).first()
         
-        if not db_user:
+        if db_user is None:
             return
         
         cart = session.query(Cart).filter_by(user_id=db_user.id).first()
         
-        if cart:
+        if cart is not None:
             cart.remove_item(product_id)
     
     await query.answer("✅ Item removido!")
@@ -189,9 +189,9 @@ async def clear_cart_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
     with db.get_session() as session:
         db_user = session.query(User).filter_by(telegram_id=user.id).first()
         
-        if db_user:
+        if db_user is not None:
             cart = session.query(Cart).filter_by(user_id=db_user.id).first()
-            if cart:
+            if cart is not None:
                 cart.clear()
     
     await query.answer("🗑️ Carrinho limpo!")
@@ -246,7 +246,7 @@ async def process_coupon(update: Update, context: ContextTypes.DEFAULT_TYPE):
         db_user = session.query(User).filter_by(telegram_id=user.id).first()
         cart = session.query(Cart).filter_by(user_id=db_user.id).first()
         
-        if cart:
+        if cart is not None:
             cart.coupon_code = code
         
         discount_type = "porcentagem" if coupon.discount_type.value == 'percentage' else "valor fixo"

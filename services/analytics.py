@@ -185,7 +185,7 @@ class AnalyticsService:
         """Estatísticas de afiliado"""
         with db.get_session() as session:
             affiliate = session.query(Affiliate).get(affiliate_id)
-            if not affiliate:
+            if affiliate is None:
                 return {}
             
             # Total de saques
