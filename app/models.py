@@ -111,7 +111,7 @@ class User(Base):
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        if not self.affiliate_code:
+        if self.affiliate_code is None or self.affiliate_code == '':
             self.affiliate_code = self._generate_affiliate_code()
     
     @staticmethod
@@ -122,7 +122,7 @@ class User(Base):
     @property
     def full_name(self) -> str:
         """Retorna nome completo do usuário"""
-        if self.first_name and self.last_name:
+        if self.first_name is not None and self.last_name is not None:
             return f"{self.first_name} {self.last_name}"
         return self.first_name or self.username or "Usuário"
     
@@ -196,7 +196,7 @@ class Product(Base):
     @hybrid_property
     def has_stock(self) -> bool:
         """Verifica se há estoque disponível"""
-        return self.unlimited_stock or self.stock > 0
+        return self.unlimited_stock is True or self.stock > 0
     
     @property
     def display_price(self) -> str:
@@ -205,7 +205,7 @@ class Product(Base):
     
     def decrease_stock(self, quantity: int = 1):
         """Diminui estoque após venda"""
-        if not self.unlimited_stock and self.stock >= quantity:
+        if self.unlimited_stock is False and self.stock >= quantity:
             self.stock -= quantity
     
     def to_dict(self) -> Dict[str, Any]:
@@ -276,7 +276,7 @@ class Order(Base):
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        if not self.order_number:
+        if self.order_number is None or self.order_number == '':
             self.order_number = self._generate_order_number()
     
     @staticmethod
@@ -387,7 +387,7 @@ class Payment(Base):
     
     @property
     def is_expired(self) -> bool:
-        if self.pix_expiration:
+        if self.pix_expiration is not None:
             return datetime.utcnow() > self.pix_expiration
         return False
     
@@ -441,15 +441,15 @@ class Coupon(Base):
     @property
     def is_valid(self) -> bool:
         """Verifica se cupom está válido"""
-        if not self.is_active:
+        if self.is_active is False:
             return False
         
         now = datetime.utcnow()
-        if self.valid_from and now < self.valid_from:
+        if self.valid_from is not None and now < self.valid_from:
             return False
-        if self.valid_until and now > self.valid_until:
+        if self.valid_until is not None and now > self.valid_until:
             return False
-        if self.max_uses and self.used_count >= self.max_uses:
+        if self.max_uses is not None and self.used_count >= self.max_uses:
             return False
         
         return True
@@ -504,7 +504,7 @@ class Affiliate(Base):
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        if not self.code:
+        if self.code is None or self.code == '':
             self.code = self._generate_code()
     
     @staticmethod
@@ -568,7 +568,7 @@ class Cart(Base):
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        if not self.expires_at:
+        if self.expires_at is None:
             self.expires_at = datetime.utcnow() + timedelta(minutes=30)
     
     def add_item(self, product_id: int, quantity: int = 1):
