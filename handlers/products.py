@@ -138,7 +138,7 @@ async def product_detail_handler(update: Update, context: ContextTypes.DEFAULT_T
     with db.get_session() as session:
         product = session.query(Product).get(product_id)
         
-        if not product or not product.is_active:
+        if product is None or not product.is_active:
             await query.edit_message_text(
                 "❌ Produto não encontrado ou indisponível.",
                 reply_markup=Keyboards.back_to_menu()
