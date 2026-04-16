@@ -25,7 +25,7 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         db_user = session.query(User).filter_by(telegram_id=user.id).first()
         
         is_new = False
-        if not db_user:
+        if db_user is None:
             # Novo usuário
             db_user = User(
                 telegram_id=user.id,
@@ -298,7 +298,7 @@ async def show_account(update: Update, context: ContextTypes.DEFAULT_TYPE):
     with db.get_session() as session:
         db_user = session.query(User).filter_by(telegram_id=user.id).first()
         
-        if not db_user:
+        if db_user is None:
             await query.edit_message_text(
                 "❌ Erro ao carregar dados. Use /start",
                 reply_markup=Keyboards.back_to_menu()
