@@ -189,7 +189,7 @@ class SillientPayService:
         """
         try:
             payload = {}
-            if amount:
+            if amount is not None and amount > 0:
                 payload['amount'] = float(amount)
             
             async with httpx.AsyncClient(timeout=10.0) as client:

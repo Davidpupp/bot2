@@ -75,7 +75,7 @@ Adicione produtos antes de finalizar a compra.
         
         for item in cart_items:
             product = session.query(Product).get(item['product_id'])
-            if product and product.is_active and product.has_stock:
+            if product is not None and product.is_active and product.has_stock:
                 quantity = item.get('quantity', 1)
                 item_subtotal = Decimal(str(product.price)) * quantity
                 
@@ -348,7 +348,7 @@ async def check_pix_status(update: Update, context: ContextTypes.DEFAULT_TYPE, p
     with db.get_session() as session:
         payment = session.query(Payment).get(payment_id)
         
-        if not payment:
+        if payment is None:
             await query.answer("❌ Pagamento não encontrado", show_alert=True)
             return
         
@@ -441,7 +441,7 @@ async def regenerate_pix(update: Update, context: ContextTypes.DEFAULT_TYPE, pay
     with db.get_session() as session:
         payment = session.query(Payment).get(payment_id)
         
-        if not payment:
+        if payment is None:
             return
         
         order = payment.order
