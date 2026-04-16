@@ -6,6 +6,7 @@ Toda a estrutura de dados da plataforma TksBot
 import uuid
 import secrets
 import string
+import logging
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
 from enum import Enum as PyEnum
