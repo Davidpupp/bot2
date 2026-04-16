@@ -348,7 +348,7 @@ async def show_vip_area(update: Update, context: ContextTypes.DEFAULT_TYPE):
         db_user = session.query(User).filter_by(telegram_id=user.id).first()
         
         # Verificar se é VIP
-        is_vip = db_user and db_user.level in [UserLevel.VIP, UserLevel.ADMIN, UserLevel.MASTER]
+        is_vip = db_user is not None and db_user.level in [UserLevel.VIP, UserLevel.ADMIN, UserLevel.MASTER]
     
     if is_vip:
         message = f"""
