@@ -4,10 +4,11 @@ Start Handler - Tela inicial e menu principal
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes, CommandHandler, CallbackQueryHandler
+from sqlalchemy import func
 
 from app.config import config
 from app.database import db
-from app.models import User, UserLevel, Cart
+from app.models import User, UserLevel, Cart, Affiliate
 from utils.keyboards import Keyboards
 from utils.logger import logger
 
@@ -46,7 +47,7 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             db_user.username = user.username
             db_user.first_name = user.first_name
             db_user.last_name = user.last_name
-            db_user.last_activity = db.func.now()
+            db_user.last_activity = func.now()
         
         user_id = db_user.id
         user_level = db_user.level
@@ -72,8 +73,8 @@ Explore nosso catálogo e descubra produtos incríveis!
         """
     else:
         # Usuário existente
-        greeting = "Bom dia" if 5 <= db.func.extract('hour', db.func.now()) < 12 else \
-                   "Boa tarde" if 12 <= db.func.extract('hour', db.func.now()) < 18 else \
+        greeting = "Bom dia" if 5 <= func.extract('hour', func.now()) < 12 else \
+                   "Boa tarde" if 12 <= func.extract('hour', func.now()) < 18 else \
                    "Boa noite"
         
         welcome_text = f"""
@@ -295,8 +296,6 @@ async def show_account(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     
     with db.get_session() as session:
-        from app.models import User, Affiliate
-        
         db_user = session.query(User).filter_by(telegram_id=user.id).first()
         
         if not db_user:
@@ -346,7 +345,6 @@ async def show_vip_area(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     
     with db.get_session() as session:
-        from app.models import User
         db_user = session.query(User).filter_by(telegram_id=user.id).first()
         
         # Verificar se é VIP
