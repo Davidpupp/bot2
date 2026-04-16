@@ -73,7 +73,7 @@ class NotificationService:
         """Notifica criação de pedido"""
         with db.get_session() as session:
             order = session.query(Order).get(order_id)
-            if not order:
+            if order is None:
                 return
             
             user = order.user
@@ -94,7 +94,7 @@ Para pagar, acesse seus pedidos ou clique em *Pagar Agora*.
         """Notifica PIX gerado"""
         with db.get_session() as session:
             payment = session.query(Payment).get(payment_id)
-            if not payment:
+            if payment is None:
                 return
             
             user = payment.order.user
@@ -117,7 +117,7 @@ Escaneie ou use o código copia e cola para pagar.
         """Notifica pagamento aprovado"""
         with db.get_session() as session:
             payment = session.query(Payment).get(payment_id)
-            if not payment:
+            if payment is None:
                 return
             
             order = payment.order
@@ -149,7 +149,7 @@ Acompanhe em 📦 Meus Pedidos
         """Notifica entrega do pedido"""
         with db.get_session() as session:
             order = session.query(Order).get(order_id)
-            if not order:
+            if order is None:
                 return
             
             user = order.user
@@ -172,7 +172,7 @@ Agradecemos a preferência! 🎉
         """Notifica cancelamento"""
         with db.get_session() as session:
             order = session.query(Order).get(order_id)
-            if not order:
+            if order is None:
                 return
             
             user = order.user
@@ -192,7 +192,7 @@ Se precisar de ajuda, contate o suporte.
         """Notifica carrinho abandonado"""
         with db.get_session() as session:
             user = session.query(User).get(user_id)
-            if not user:
+            if user is None:
                 return
             
             message = f"""

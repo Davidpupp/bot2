@@ -157,7 +157,7 @@ class AnalyticsService:
         """Estatísticas de usuário específico"""
         with db.get_session() as session:
             user = session.query(User).get(user_id)
-            if not user:
+            if user is None:
                 return {}
             
             total_orders = session.query(func.count(Order.id)).filter(

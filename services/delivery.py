@@ -39,7 +39,7 @@ class DeliveryService:
         """
         with db.get_session() as session:
             order = session.query(Order).get(order_id)
-            if not order:
+            if order is None:
                 logger.error(f"Pedido não encontrado: {order_id}")
                 return False
             
