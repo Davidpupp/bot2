@@ -219,7 +219,7 @@ async def process_pix_payment(update: Update, context: ContextTypes.DEFAULT_TYPE
             status=PaymentStatus.PENDING
         ).first()
         
-        if existing_payment:
+        if existing_payment is not None:
             # Mostrar pagamento existente
             await show_pix_payment(update, context, existing_payment)
             return
@@ -514,7 +514,7 @@ async def buy_now(update: Update, context: ContextTypes.DEFAULT_TYPE, product_id
         
         # Limpar carrinho atual
         cart = session.query(Cart).filter_by(user_id=db_user.id).first()
-        if cart:
+        if cart is not None:
             cart.clear()
             cart.add_item(product_id, 1)
         else:

@@ -73,7 +73,7 @@ async def show_products_by_category(update: Update, context: ContextTypes.DEFAUL
             telegram_id=update.effective_user.id
         ).first()
         
-        is_vip = user and user.level.value in ['vip', 'admin', 'master']
+        is_vip = user is not None and user.level.value in ['vip', 'admin', 'master']
         
         if not is_vip:
             products_query = products_query.filter_by(is_vip=False)
@@ -151,9 +151,9 @@ async def product_detail_handler(update: Update, context: ContextTypes.DEFAULT_T
         ).first()
         
         in_cart = False
-        if user:
+        if user is not None:
             cart = session.query(Cart).filter_by(user_id=user.id).first()
-            if cart and cart.items:
+            if cart is not None and cart.items:
                 cart_items = cart.items if isinstance(cart.items, list) else []
                 in_cart = any(item.get('product_id') == product_id for item in cart_items)
         

@@ -234,7 +234,7 @@ async def process_coupon(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         coupon = session.query(Coupon).filter_by(code=code, is_active=True).first()
         
-        if not coupon or not coupon.is_valid:
+        if coupon is None or not coupon.is_valid:
             await update.message.reply_text(
                 f"❌ Cupom *{code}* inválido ou expirado.",
                 parse_mode='Markdown',
